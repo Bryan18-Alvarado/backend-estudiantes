@@ -8,7 +8,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { EstudiantesService } from '../services/ estudiantes.service';
-import { CreateEstudianteDto } from '../dto/estudiante.dto';
+import {
+  CreateEstudianteDto,
+  UpdateEstudianteDto,
+} from '../dto/estudiante.dto';
 
 @Controller('estudiantes')
 export class EstudiantesController {
@@ -38,7 +41,7 @@ export class EstudiantesController {
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() estudianteDto: CreateEstudianteDto,
+    @Body() estudianteDto: UpdateEstudianteDto,
   ) {
     return this.estudianteService.update(id, estudianteDto);
   }

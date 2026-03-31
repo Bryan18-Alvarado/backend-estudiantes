@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Estudiante } from '../entities/estudiante.entity';
 import { Repository } from 'typeorm';
-import { CreateEstudianteDto } from '../dto/estudiante.dto';
+import {
+  CreateEstudianteDto,
+  UpdateEstudianteDto,
+} from '../dto/estudiante.dto';
 
 @Injectable()
 export class EstudiantesService {
@@ -29,7 +32,7 @@ export class EstudiantesService {
     }
   }
 
-  async update(id: number, estudianteDto: CreateEstudianteDto) {
+  async update(id: number, estudianteDto: UpdateEstudianteDto) {
     try {
       const students = await this.estudianteRepo.findOneBy({ id });
 
