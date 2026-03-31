@@ -1,13 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { EstudiantesService } from '../services/ estudiantes.service';
+import { EstudiantesService } from '../services/estudiantes.service';
 import {
   CreateEstudianteDto,
   UpdateEstudianteDto,
@@ -44,5 +45,10 @@ export class EstudiantesController {
     @Body() estudianteDto: UpdateEstudianteDto,
   ) {
     return this.estudianteService.update(id, estudianteDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.estudianteService.delete(id);
   }
 }

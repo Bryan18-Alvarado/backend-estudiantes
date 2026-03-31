@@ -52,4 +52,19 @@ export class EstudiantesService {
       throw error;
     }
   }
+
+  async delete(id: number) {
+    try {
+      const students = await this.estudianteRepo.findOneBy({ id });
+
+      if (!students) {
+        throw new NotFoundException(`El estudiante con id ${id} no existe`);
+      }
+      await this.estudianteRepo.delete(id);
+      return { message: `Estudiante con id ${id} eliminado exitosamente` };
+    } catch (error) {
+      console.log('error:', error);
+      throw error;
+    }
+  }
 }
