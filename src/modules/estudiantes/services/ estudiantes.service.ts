@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Estudiante } from '../entities/estudiante.entity';
 import { Repository } from 'typeorm';
@@ -26,6 +26,27 @@ export class EstudiantesService {
       return await this.estudianteRepo.save(estudiante);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async update(id: number, estudianteDto: CreateEstudianteDto) {
+    try {
+      const students = await this.estudianteRepo.findOneBy({ id });
+
+      if (!students) {
+        throw new NotFoundException(`El estudiante con id ${id} no existe`);
+      }
+
+      const updated = {
+        ...students,
+        ...estudianteDto,
+        id: students.id,
+      };
+
+      return await this.estudianteRepo.save(updated);
+    } catch (error) {
+      console.log('Error:', error);
+      throw error;
     }
   }
 }

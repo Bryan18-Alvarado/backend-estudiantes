@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { EstudiantesService } from '../services/ estudiantes.service';
 import { CreateEstudianteDto } from '../dto/estudiante.dto';
@@ -32,5 +33,13 @@ export class EstudiantesController {
       message: 'Registro agregado con exito',
     };
     return datos;
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() estudianteDto: CreateEstudianteDto,
+  ) {
+    return this.estudianteService.update(id, estudianteDto);
   }
 }
