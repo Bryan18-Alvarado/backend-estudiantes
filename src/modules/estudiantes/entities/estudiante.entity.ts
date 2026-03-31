@@ -13,7 +13,7 @@ import {
 @Entity({ schema: 'estudiantes', name: 'estudiante' })
 export class Estudiante {
   @PrimaryGeneratedColumn('increment')
-  id?: number;
+  id: number;
 
   @Column({ type: 'varchar', nullable: false, length: 60 })
   nombres: string;
