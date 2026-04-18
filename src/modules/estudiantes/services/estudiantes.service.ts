@@ -1,25 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { CreateEstudianteDto } from '../dto/estudiante.dto';
 import { Estudiante } from '../entities/estudiante.entity';
-import { Repository } from 'typeorm';
-import {
-  CreateEstudianteDto,
-  UpdateEstudianteDto,
-} from '../dto/estudiante.dto';
 
 @Injectable()
 export class EstudiantesService {
   constructor(
     @InjectRepository(Estudiante)
     private readonly estudianteRepo: Repository<Estudiante>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  getAll() {
-    return `Endpoint para getAll`;
+  async getAll() {
+    const rows = this.dataSource
+      .getRepository(Estudiante)
+      .createQueryBuilder('estudiantes')
+      .where('estudiantes.id is not null');
+
+    return await rows.getMany();
   }
 
-  getOne(id: number) {
-    return `Esto retorna el id ${id}`;
+  async getOne(id: number) {
+    const row = await this.estudianteRepo.findOne({ where: { id: id } });
+
+    if (!row) {
+      throw new NotFoundException(`No se encuentra el registro ${id}`);
+    }
+
+    return row;
   }
 
   async create(estudianteDto: CreateEstudianteDto) {
@@ -32,39 +41,15 @@ export class EstudiantesService {
     }
   }
 
-  async update(id: number, estudianteDto: UpdateEstudianteDto) {
-    try {
-      const students = await this.estudianteRepo.findOneBy({ id });
+  async delete(id: number, payload: CreateEstudianteDto) {
+    const row = await this.getOne(id);
 
-      if (!students) {
-        throw new NotFoundException(`El estudiante con id ${id} no existe`);
-      }
+    const mergeData = this.estudianteRepo.merge(row, payload);
 
-      const updated = {
-        ...students,
-        ...estudianteDto,
-        id: students.id,
-      };
+    const updateData = await this.estudianteRepo.save(mergeData);
 
-      return await this.estudianteRepo.save(updated);
-    } catch (error) {
-      console.log('Error:', error);
-      throw error;
-    }
-  }
+    await this.estudianteRepo.remove(updateData);
 
-  async delete(id: number) {
-    try {
-      const students = await this.estudianteRepo.findOneBy({ id });
-
-      if (!students) {
-        throw new NotFoundException(`El estudiante con id ${id} no existe`);
-      }
-      await this.estudianteRepo.delete(id);
-      return { message: `Estudiante con id ${id} eliminado exitosamente` };
-    } catch (error) {
-      console.log('error:', error);
-      throw error;
-    }
+    return row;
   }
 }

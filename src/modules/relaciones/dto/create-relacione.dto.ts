@@ -1,1 +1,3 @@
-// export class CreateRelacioneDto {}
+// export class CreateRelacioneDto {
+//   sexo: string;
+// }

@@ -1,35 +1,29 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Put,
-} from '@nestjs/common';
+import { Controller, ParseIntPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import {
-  CreateEstudianteDto,
-  UpdateEstudianteDto,
-} from '../dto/estudiante.dto';
+import { CreateEstudianteDto } from '../dto/estudiante.dto';
 import { EstudiantesService } from '../services/estudiantes.service';
-
 @Controller('estudiantes')
 export class EstudiantesController {
   constructor(private readonly estudianteService: EstudiantesService) {}
 
-  @Get()
-  getAll() {
-    return this.estudianteService.getAll();
+  @MessagePattern({ cmd: 'get_all_student' })
+  async getAll() {
+    const rows = await this.estudianteService.getAll();
+
+    const datos = {
+      data: rows,
+      count: rows.length,
+    };
+
+    return datos;
   }
 
-  @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
+  @MessagePattern({ cmd: 'get_one_student' })
+  getOne(@Payload(ParseIntPipe) id: number) {
     return this.estudianteService.getOne(id);
   }
 
-  // @Post()
-  @MessagePattern({ cmd: 'create_estudiante' })
+  @MessagePattern({ cmd: 'create_student' })
   async create(@Payload() estudianteDto: CreateEstudianteDto) {
     const estudiante = await this.estudianteService.create(estudianteDto);
 
@@ -37,19 +31,12 @@ export class EstudiantesController {
       data: estudiante,
       message: 'Registro agregado con exito',
     };
+
     return datos;
   }
 
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() estudianteDto: UpdateEstudianteDto,
-  ) {
-    return this.estudianteService.update(id, estudianteDto);
-  }
-
-  @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
-    return this.estudianteService.delete(id);
+  @MessagePattern({ cmd: 'remove_student' })
+  remove(@Payload(ParseIntPipe) id: number, payload: CreateEstudianteDto) {
+    return this.estudianteService.delete(id, payload);
   }
 }
