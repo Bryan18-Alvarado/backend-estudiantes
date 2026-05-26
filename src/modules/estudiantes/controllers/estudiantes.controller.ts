@@ -35,6 +35,12 @@ export class EstudiantesController {
     return datos;
   }
 
+  @MessagePattern({ cmd: 'update_student' })
+  update(@Payload() payload: { id: number; data: CreateEstudianteDto }) {
+    const { id, data } = payload;
+    return this.estudianteService.update(id, data);
+  }
+
   @MessagePattern({ cmd: 'remove_student' })
   remove(@Payload(ParseIntPipe) id: number, payload: CreateEstudianteDto) {
     return this.estudianteService.delete(id, payload);

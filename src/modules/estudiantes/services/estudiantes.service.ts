@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { CreateEstudianteDto } from '../dto/estudiante.dto';
+import {
+  CreateEstudianteDto,
+  UpdateEstudianteDto,
+} from '../dto/estudiante.dto';
 import { Estudiante } from '../entities/estudiante.entity';
 
 @Injectable()
@@ -39,6 +42,13 @@ export class EstudiantesService {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async update(id: number, estudianteDto: UpdateEstudianteDto) {
+    const row = await this.getOne(id);
+
+    const mergeData = this.estudianteRepo.merge(row, estudianteDto);
+    return await this.estudianteRepo.save(mergeData);
   }
 
   async delete(id: number, payload: CreateEstudianteDto) {
